@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Application xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:MyApp.Helpers"
+             x:Class="MyApp.App">
+    <Application.Resources>
+        <!--Styles-->
+        <Style TargetType="ContentPage" ApplyToDerivedTypes="True">
+            <Setter Property="BackgroundColor" Value="Cyan"/>
+        </Style>
+
+        <!--Converters-->
+        
+        <!--Colors-->
+        <Color x:Key="Primary">#b6faee</Color>
+        <Color x:Key="PrimaryDark">#75849D</Color>
+        <Color x:Key="Secondary">#B5BBC2</Color>
+        <Color x:Key="Accent">LightGray</Color>
+        <Color x:Key="LightColor">LightGray</Color>
+    </Application.Resources>
+</Application>

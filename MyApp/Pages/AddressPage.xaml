@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:behavior="clr-namespace:MyApp.Helpers"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:MyApp.Helpers"
+             Title="Shipping Information"
+             mc:Ignorable="d"
+             x:Class="MyApp.AddressPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <x:String x:Key="SubTotal">Subtotal:</x:String>
+            <x:String x:Key="OrderSummary">OrderSummary:</x:String>
+            <x:String x:Key="Tax">Tax:</x:String>
+            <x:String x:Key="OrderTotal">Order Total:</x:String>
+            <x:String x:Key="ExpiryDate">1203</x:String>
+            <x:String x:Key="CVV">123</x:String>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <StackLayout BackgroundColor="{StaticResource Primary}">
+            <StackLayout.Padding>
+                <OnPlatform x:TypeArguments="Thickness">
+                    <On Platform="iOS" Value="5,20,5,5" />
+                    <On Platform="Android" Value="5,0,5,5" />
+                    <On Platform="UWP" Value="10" />
+                </OnPlatform>
+            </StackLayout.Padding>
+            <StackLayout.Margin>
+                <OnPlatform x:TypeArguments="Thickness">
+                    <On Platform="iOS" Value="0,20,0,0" />
+                    <On Platform="Android, WinPhone, UWP" Value="0,0,0,0" />
+                </OnPlatform>
+            </StackLayout.Margin>
+            <StackLayout Orientation="Horizontal">
+                <Label Text="Order Amount: "/>
+                <local:DoneEntry Placeholder="Amount" x:Name="orderAmount" Text="{Binding OrderAmount}" WidthRequest="50" HorizontalOptions="FillAndExpand" 
+                       Keyboard="Numeric">
+                    <local:DoneEntry.Behaviors/>
+                </local:DoneEntry>
+            </StackLayout>
+
+            <Label Text="Shipping Addresses"></Label>
+            <Entry Placeholder="Street Address" x:Name="Address1" Text="{Binding address.Address1}"></Entry>
+            <StackLayout Orientation="Horizontal" Spacing="8">
+                <Entry Placeholder="City......" x:Name="City" Text="{Binding address.City}" 
+                         WidthRequest="300">
+                    <Entry.Keyboard>
+                        <Keyboard x:FactoryMethod="Create">
+                            <x:Arguments>
+                                <KeyboardFlags>Suggestions,CapitalizeWord</KeyboardFlags>
+                            </x:Arguments>
+                        </Keyboard>
+                    </Entry.Keyboard>
+                </Entry>
+                <Picker x:Name="statepicker"   
+                        Title="State" 
+                        WidthRequest="100"
+                        ItemsSource="{Binding States}" 
+                        ItemDisplayBinding="{Binding Code}" 
+                        SelectedItem="{Binding SelectedState}"/>
+
+            </StackLayout>
+            <StackLayout>
+                <Entry Placeholder="Zipcode" x:Name="Zipcode" Text="{Binding address.Zipcode}" WidthRequest="100" ></Entry>
+            </StackLayout>
+
+            <Button Text="Submit" Command="{Binding CalculateCommand}" IsVisible="{Binding CalculateTax}"></Button>
+            <StackLayout IsVisible="{Binding CheckOut}">
+                <!--<Label   Text="{Binding Subtotal}" TranslationY="2" Font="Bold, Medium"/>
+                <Label  Text="{Binding SalesTax}" TranslationY="2" x:Name="TaxLabel" Font="Bold, Medium"/>
+                <Label Text="{Binding OrderTotal}" TranslationY="2" Font="Bold, Large"/>-->
+                
+                <Label Text="{DynamicResource OrderSummary}"
+                VerticalOptions="Start" 
+                HorizontalOptions="Start"  Font="Bold, Large"/>
+
+                <Grid Padding="15,0,15,0" BackgroundColor="BlanchedAlmond">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label x:Name="SubTotalLabel" Grid.Row="0" Grid.Column="0" Text="{Binding SubTotal}" TranslationY="2" Font="Bold, Medium"/>
+                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding SalesTax}" TranslationY="2" x:Name="TaxLabel" Font="Bold, Medium"/>
+                    <Label x:Name="GrandTotalLabel" Grid.Row="2" Grid.Column="0" Text="{Binding OrderTotal}" TranslationY="2" Font="Bold, Large"/>
+                </Grid>
+                <Button Text="Complete Order" Command="{Binding CompleteCommand}"></Button>
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
