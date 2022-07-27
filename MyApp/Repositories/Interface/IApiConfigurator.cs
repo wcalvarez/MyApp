@@ -4,7 +4,9 @@ using System.Text;
 
 namespace MyApp
 {
-    public class ProductsPageModel
+    public interface IApiConfigurator
     {
+        string GetApiUrl();
+        string GetApiKey();
     }
 }

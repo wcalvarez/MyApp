@@ -4,9 +4,12 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:behavior="clr-namespace:MyApp.Helpers"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:fastEntry="clr-namespace:XamarinFastEntrySample.FastEntry;assembly=XamarinFastEntry.Behaviors"
+             
              xmlns:local="clr-namespace:MyApp.Helpers"
              Title="Shipping Information"
              mc:Ignorable="d"
+             AutomationId="AddressPage"
              x:Class="MyApp.AddressPage">
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -35,16 +38,34 @@
             </StackLayout.Margin>
             <StackLayout Orientation="Horizontal">
                 <Label Text="Order Amount: "/>
-                <local:DoneEntry Placeholder="Amount" x:Name="orderAmount" Text="{Binding OrderAmount}" WidthRequest="50" HorizontalOptions="FillAndExpand" 
+                <!--<local:DoneEntry Placeholder="Amount" AutomationId="Entry_OrderAmount"  x:Name="orderAmount" Text="{Binding OrderAmount}" WidthRequest="50" HorizontalOptions="FillAndExpand" 
                        Keyboard="Numeric">
                     <local:DoneEntry.Behaviors/>
-                </local:DoneEntry>
+                    <Entry.HeightRequest>
+                        <OnPlatform x:TypeArguments="x:Double">
+                            <On Platform="iOS">35</On>
+                            <On Platform="Android,Windows">40</On>
+                        </OnPlatform>
+                    </Entry.HeightRequest>
+
+                </local:DoneEntry>-->
+                <Entry Placeholder="Amount" AutomationId="entryOrderAmount"  x:Name="orderAmount" Text="{Binding OrderAmount}" WidthRequest="50" HorizontalOptions="FillAndExpand" 
+                       Keyboard="Numeric">
+                     
+                    <Entry.HeightRequest>
+                        <OnPlatform x:TypeArguments="x:Double">
+                            <On Platform="iOS">35</On>
+                            <On Platform="Android,Windows">40</On>
+                        </OnPlatform>
+                    </Entry.HeightRequest>
+
+                </Entry>
             </StackLayout>
 
             <Label Text="Shipping Addresses"></Label>
-            <Entry Placeholder="Street Address" x:Name="Address1" Text="{Binding address.Address1}"></Entry>
+            <Entry Placeholder="Street Address" x:Name="Address1" AutomationId="Entry_Street"  Text="{Binding address.Address1}"></Entry>
             <StackLayout Orientation="Horizontal" Spacing="8">
-                <Entry Placeholder="City......" x:Name="City" Text="{Binding address.City}" 
+                <Entry Placeholder="City......" x:Name="City"  AutomationId="Entry_City"  Text="{Binding address.City}" 
                          WidthRequest="300">
                     <Entry.Keyboard>
                         <Keyboard x:FactoryMethod="Create">
@@ -54,7 +75,7 @@
                         </Keyboard>
                     </Entry.Keyboard>
                 </Entry>
-                <Picker x:Name="statepicker"   
+                <Picker x:Name="statepicker"   AutomationId="Picker_State"
                         Title="State" 
                         WidthRequest="100"
                         ItemsSource="{Binding States}" 
@@ -63,10 +84,10 @@
 
             </StackLayout>
             <StackLayout>
-                <Entry Placeholder="Zipcode" x:Name="Zipcode" Text="{Binding address.Zipcode}" WidthRequest="100" ></Entry>
+                <Entry Placeholder="Zipcode" x:Name="Zipcode" AutomationId="Entry_Zipcode"  Text="{Binding address.Zipcode}" WidthRequest="100" ></Entry>
             </StackLayout>
 
-            <Button Text="Submit" Command="{Binding CalculateCommand}" IsVisible="{Binding CalculateTax}"></Button>
+            <Button Text="Submit" Command="{Binding CalculateCommand}" IsVisible="{Binding CalculateTax}" AutomationId="Button_SubmitOrder" ></Button>
             <StackLayout IsVisible="{Binding CheckOut}">
                 <!--<Label   Text="{Binding Subtotal}" TranslationY="2" Font="Bold, Medium"/>
                 <Label  Text="{Binding SalesTax}" TranslationY="2" x:Name="TaxLabel" Font="Bold, Medium"/>
@@ -95,7 +116,7 @@
                     <Label Grid.Row="1" Grid.Column="0" Text="{Binding SalesTax}" TranslationY="2" x:Name="TaxLabel" Font="Bold, Medium"/>
                     <Label x:Name="GrandTotalLabel" Grid.Row="2" Grid.Column="0" Text="{Binding OrderTotal}" TranslationY="2" Font="Bold, Large"/>
                 </Grid>
-                <Button Text="Complete Order" Command="{Binding CompleteCommand}"></Button>
+                <Button Text="Complete Order" Command="{Binding CompleteCommand}" AutomationId="Button_CompleteOrder" ></Button>
             </StackLayout>
         </StackLayout>
     </ContentPage.Content>

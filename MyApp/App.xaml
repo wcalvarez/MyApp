@@ -6,9 +6,23 @@
     <Application.Resources>
         <!--Styles-->
         <Style TargetType="ContentPage" ApplyToDerivedTypes="True">
-            <Setter Property="BackgroundColor" Value="Cyan"/>
+            <Setter Property="BackgroundColor" Value="#edf7f7"/>
         </Style>
 
+        <Style TargetType="NavigationPage" ApplyToDerivedTypes="True">
+            <Setter Property="BarBackgroundColor" Value="#ede5b4"/>
+            <Setter Property="BarTextColor" Value="Black"/>
+ 
+
+        </Style>
+
+        <Style TargetType="Button" ApplyToDerivedTypes="True">
+            <Setter Property="BackgroundColor" Value="#349beb"/>
+            <Setter Property="TextColor" Value="White"/>
+            <Setter Property="WidthRequest" Value="400"/>
+            <Setter Property="FontSize" Value="Medium"/>
+        </Style>
+        
         <!--Converters-->
         
         <!--Colors-->

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -18,6 +19,7 @@ namespace MyApp.Dto.TaxJar
         public string to_street { get; set; }
         public decimal amount { get; set; }
         public decimal shipping { get; set; }
+        public List<NexusAddress> nexus_addresses { get; set; }
         public List<LineItem> line_items { get; set; }
     }
 }

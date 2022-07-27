@@ -1,11 +1,15 @@
-﻿using System;
+﻿using SQLite;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MyApp.Dto
+namespace MyApp.Models
 {
-    public class CountryDto
+    public class Country
     {
+        [PrimaryKey]
+        [NotNull]
+        [AutoIncrement]
         public int Id { get; set; }
         public int CountryId { get; set; }
         public int CurrencyId { get; set; }

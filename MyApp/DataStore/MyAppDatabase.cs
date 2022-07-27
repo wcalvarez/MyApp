@@ -29,13 +29,13 @@ namespace MyApp
                 fileStreamToWrite.Close();
             }
 
-
             conn = new SQLiteAsyncConnection(DatabasePath);
             conn.CreateTableAsync<Location>().Wait();
             conn.CreateTableAsync<Address>().Wait();
             conn.CreateTableAsync<Customer>().Wait();
             conn.CreateTableAsync<State>().Wait();
             conn.CreateTableAsync<ShipToAddress>().Wait();
+            conn.CreateTableAsync<Country>().Wait();
         }
     }
 }

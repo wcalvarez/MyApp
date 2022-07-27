@@ -11,23 +11,26 @@ using System.ComponentModel;
 using Xamarin.Essentials;
 using System.Globalization;
 using MyApp.Dto.TaxJar;
+using MyApp.Repositories;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyApp
 {
     public class AddressPageModel : FreshBasePageModel, INotifyPropertyChanged
     {
-
+       // private readonly IRatesApi _ratesApi;
         public AddressPageModel(LocationDto location)
-        {
+        {   
             address = new Address();
             CalculateCommand = new Command(SubmitTax);
             CompleteCommand = new Command(CompleteOrder);
             var locs = App.appRepo.GetLocationsAsync();
-            CalculateTax = true;
-            CheckOut = false;
             
+            CalculateTax = true;
+            CheckOut = false;   
         }
-
+       
         #region Override Functions
         LocationDto location = new LocationDto();
         public override void Init(object initData)
@@ -46,12 +49,13 @@ namespace MyApp
             base.ViewIsAppearing(sender, e);
             
             Countries = new ObservableCollection<CountryDto>();
-            Countries.Add(new CountryDto { CountryID = 1, Name = "United States", isoalphacode2 = "US", isoalphacode3 = "USA", languageCode = "en-US" });
-            //Countries.Add(new CountryDto { CountryID = 2, Name = "Canada", isoalphacode2 = "CA", isoalphacode3 = "CAN", languageCode = "en-ca" });
+            Countries.Add(new CountryDto { CountryId = 1, Name = "United States", isoalphacode2 = "US", isoalphacode3 = "USA", languageCode = "en-US" });
+
             SelectedCountry = Countries[0];
 
             States = new ObservableCollection<State>();
-            List<State> states = await App.appRepo.GetStatesAsync(SelectedCountry.CountryID);
+            List<State> states = await App.appRepo.GetStatesAsync(SelectedCountry.CountryId);
+            states = states.OrderBy(x => x.Code).ToList();
             foreach(State state in states)
             {
                 States.Add(state);
@@ -68,38 +72,30 @@ namespace MyApp
         #region Commands
         private async void CompleteOrder()
         {
+            OrderAmount = 0;
+            address = new Address();
+
             await CoreMethods.PopPageModel();
         }
         private async void SubmitTax()
         {
+            bool valid = await validEntries();
+
+            if (!valid)
+                return;
+
             address.Country = selectedCountry.isoalphacode2;
 
-            if (selectedCountry != null && selectedState != null)
-            {
-                if (selectedCountry.isoalphacode3 == "USA")
-                {
-                    address.State = selectedState.Code;
-                }
-                else
-                {
-                    address.State = selectedState.Name;
-                }
-                if (address.Address1 == null || address.City == null)
-                {
-                    await App.Current.MainPage.DisplayAlert("Alert", "Address & City are required.", "OK");
-                    return;
-                }
-            }
-            else
-            {
-                await App.Current.MainPage.DisplayAlert("Alert", "Select Country and State/Province", "OK");
-                return;
-            }
+            
+           if (selectedCountry.isoalphacode3 == "USA")
+           {
+               address.State = selectedState.Code;
+           }
+           else
+           {
+               address.State = selectedState.Name;
+           }
 
-            //App.appRepo2.AddNewAddress(address);
-            //addresses.Add(address);
-            ////clear input fields
-            //address = new Address();
             //Get Tax Amount, Tax Rate from TaxJar
             string subtotal = OrderAmount.ToString("C", cfi);
             SubTotal = "Sub Total:......." + subtotal;
@@ -121,7 +117,7 @@ namespace MyApp
             taxInput.to_zip = address.Zipcode;
             taxInput.to_country = address.Country;
             taxInput.amount = OrderAmount;
-            taxInput.shipping = 0;
+            taxInput.shipping = 5;
 
             TaxRateInput ti = new TaxRateInput();
             ti.city = address.City;
@@ -129,10 +125,30 @@ namespace MyApp
             ti.country = address.Country;
             ti.zip = address.Zipcode;
 
-            decimal taxRate = await App.taxService.GetTaxRate(ti);
+            taxInput.nexus_addresses = new List<NexusAddress>();
+            List<Address> nexus = await App.appRepo.GetAllAddresses();
+            foreach (Address addr in nexus)
+            {
+                taxInput.nexus_addresses.Add(
+                    new NexusAddress
+                    {
+                        id = addr.Address1,
+                        street = addr.Address1,
+                        country = addr.Country,
+                        city = addr.City,
+                        state = addr.State,
+                        zip = addr.Zipcode
+                    }
+                    );
+            }
+            //TaxRates rateService = new TaxRates();
+            decimal Tax = 0;
+            //decimal taxRate = await App.taxService.GetTaxRate(ti);
             decimal taxAmount = await App.taxService.CalculateTax(taxInput);
 
-            Decimal Tax = OrderAmount * taxRate;
+            //Tax = OrderAmount * taxRate;
+            Tax = taxAmount;
+            //string tax = Tax.ToString("C", cfi);
             string tax = taxAmount.ToString("C", cfi);
             SalesTax = "Sales Tax:......." + tax;
 
@@ -142,8 +158,22 @@ namespace MyApp
             OrderTotal = "Grand Total:....." + ordtotal;
             CheckOut = true;
             CalculateTax = false;
-            //await CoreMethods.PopPageModel();
 
+        }
+
+        private async Task<bool> validEntries()
+        {
+            if(OrderAmount == 0 || String.IsNullOrEmpty(address.Address1) ||
+                String.IsNullOrEmpty(address.City) || SelectedState == null || String.IsNullOrEmpty(address.Zipcode))
+            {
+                await App.Current.MainPage.DisplayAlert("Alert", "All entries are required.", "OK");
+            }
+            else
+            {
+                return true;
+            }
+
+            return false;
         }
         #endregion
 
@@ -164,8 +194,6 @@ namespace MyApp
         CultureInfo cfi;
 
         readonly DataManager manager = new DataManager();
-        //IList<CountryDto> countrylist;
-        //IList<StateDto> statelist;
 
         CountryDto selectedCountry;
 
@@ -178,8 +206,7 @@ namespace MyApp
             set
             {
                 selectedCountry = value;
-                //if (value != null)
-                //    CountrySelected.Execute(value);
+
             }
         }
 
@@ -194,8 +221,6 @@ namespace MyApp
             set
             {
                 selectedState = value;
-                //if (value != null)
-                //    CountrySelected.Execute(value);
             }
         }
         public Address selectedAddress;

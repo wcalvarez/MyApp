@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Hosting;
 using MyApp.Dto.TaxJar;
+using MyApp.Repositories;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Refit;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -17,7 +20,16 @@ namespace MyApp
         //Refit Solution
         //
         //
- 
+        private HttpClientFactory clientFactory;
+        private readonly ApiConfigurator _apiConfigurator;
+       // private readonly IRatesApi _ratesApi;
+
+        public TaxService()
+        {
+            _apiConfigurator = new ApiConfigurator();
+            clientFactory = new HttpClientFactory(_apiConfigurator);
+          //  _ratesApi = ratesApi;
+        }
 
     //
     //
@@ -31,10 +43,11 @@ namespace MyApp
             _apiService = new APIService();
             
             HttpMessageHandler handler = new AuthorizedHandler(GetAuthenticationHeader);
-           // handler = new LoggerHttpMessageHandler(handler);
-            client = new HttpClient(handler);
+             handler = new LoggerHttpMessageHandler(handler);
+            client = clientFactory.CreateHttpClient(_apiConfigurator.GetApiUrl(), true);
+            
             client.DefaultRequestHeaders.Add(GetKey(), GetValue());
-            //client.BaseAddress = new Uri(_apiService.GetTaxJarBaseUrl());
+            client.BaseAddress = new Uri(_apiService.GetTaxJarBaseUrl());
 
             return client;
         }
@@ -65,9 +78,11 @@ namespace MyApp
             byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             HttpResponseMessage response = new HttpResponseMessage();
             TaxAmount taxes = new TaxAmount();
+
             try
             {
-                response = await client.PostAsync(Url2, byteContent);
+                 response = await client.PostAsync(Url2, byteContent);
+                
             }
             catch(Exception ex)
             {
@@ -76,7 +91,10 @@ namespace MyApp
             if (response.IsSuccessStatusCode)
             {
                 var contents = await response.Content.ReadAsStringAsync();
-                taxes = JsonConvert.DeserializeObject<TaxAmount>(contents);
+                var jsonString = await response.Content.ReadAsStringAsync();
+                JObject obj = JObject.Parse(jsonString);
+                var jtax = obj["tax"].ToString();
+                taxes = JsonConvert.DeserializeObject<TaxAmount>(jtax);
             }
             else
             {
@@ -85,15 +103,33 @@ namespace MyApp
             return taxes.amount_to_collect;
         }
 
+        //
+        //
+        //public async Task<ApiResponse<TaxRate>> GetRates(string zipCode, string country, string city = null)
+        //{
+        //    ApiResponse<TaxRate> response = (ApiResponse<TaxRate>)await this.GetRates(zipCode, country, city);
+
+
+        //    if (response.IsSuccessStatusCode && response.Content != null)
+        //    {
+        //        return response;
+        //    }
+
+        //    return response;
+        //}
+        //
+        //
         public async Task<decimal> GetTaxRate(TaxRateInput location)
         {
+         
             TaxRate rate = new TaxRate();
-
-            string Url = "https://api.taxjar.com/v2/rates/";
+        string Url = "https://api.taxjar.com/v2/rates/";
             Url += location.zip;
-
+            
 
             HttpClient client = await GetClient();
+
+            //client.DefaultRequestHeaders.Add("Token", "Bearer 5da2f821eee4035db4771edab942a4cc");
             var builder = new UriBuilder(Url);
   
             var query = HttpUtility.ParseQueryString(builder.Query);
@@ -103,8 +139,14 @@ namespace MyApp
             string url = builder.ToString();
             try
             {
-                var jsonString = await client.GetStringAsync(url);
-                 rate = JsonConvert.DeserializeObject<TaxRate>(jsonString);
+                HttpResponseMessage response = new HttpResponseMessage();
+               response = await client.GetAsync(url);
+                var jsonString = await response.Content.ReadAsStringAsync();
+                JObject obj = JObject.Parse(jsonString);
+                var jrate = obj["rate"].ToString();
+               
+                rate = JsonConvert.DeserializeObject<TaxRate>(jrate);
+ 
             }
             catch(Exception ex)
             {
