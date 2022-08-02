@@ -103,22 +103,7 @@ namespace MyApp
             return taxes.amount_to_collect;
         }
 
-        //
-        //
-        //public async Task<ApiResponse<TaxRate>> GetRates(string zipCode, string country, string city = null)
-        //{
-        //    ApiResponse<TaxRate> response = (ApiResponse<TaxRate>)await this.GetRates(zipCode, country, city);
 
-
-        //    if (response.IsSuccessStatusCode && response.Content != null)
-        //    {
-        //        return response;
-        //    }
-
-        //    return response;
-        //}
-        //
-        //
         public async Task<decimal> GetTaxRate(TaxRateInput location)
         {
          

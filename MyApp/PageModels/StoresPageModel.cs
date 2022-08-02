@@ -13,6 +13,7 @@ namespace MyApp
     
     public class StoresPageModel : FreshBasePageModel , INotifyPropertyChanged
     {
+        
         public StoresPageModel()
         {
             
@@ -68,7 +69,8 @@ namespace MyApp
         }
         #endregion
         #region Commands
-       // private readonly IRatesApi _ratesApi;
+        // private readonly IRatesApi _ratesApi;
+        
         public Command<LocationDto> LocationSelected
         {
             get

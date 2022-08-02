@@ -19,10 +19,15 @@ namespace MyApp
 {
     public class AddressPageModel : FreshBasePageModel, INotifyPropertyChanged
     {
-       // private readonly IRatesApi _ratesApi;
+        // private readonly IRatesApi _ratesApi;
+        public ITaxService _taxService;
+        TaxRepository taxRepo = new TaxRepository(new TaxService());  //inject TaxService
+        public ITaxRepository _taxRepository;
         public AddressPageModel(LocationDto location)
-        {   
+        {
+            
             address = new Address();
+            
             CalculateCommand = new Command(SubmitTax);
             CompleteCommand = new Command(CompleteOrder);
             var locs = App.appRepo.GetLocationsAsync();
@@ -141,10 +146,10 @@ namespace MyApp
                     }
                     );
             }
-            //TaxRates rateService = new TaxRates();
+
             decimal Tax = 0;
-            //decimal taxRate = await App.taxService.GetTaxRate(ti);
-            decimal taxAmount = await App.taxService.CalculateTax(taxInput);
+            decimal taxRate = await taxRepo.GetTaxRate(ti);
+            decimal taxAmount = await taxRepo.CalculateTax(taxInput);
 
             //Tax = OrderAmount * taxRate;
             Tax = taxAmount;
